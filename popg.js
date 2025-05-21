@@ -23,22 +23,22 @@
  */
 
 // configure script
-var NO_DRIFT_COLOR='#007bff';           // color for "No gene drift" ideal trace 
-var TRACE_COLOR='#212529';              // color for simulated population traces
-var AXIS_FONT_COLOR=TRACE_COLOR;        // axis font color
-var AXIS_FONT_SIZE=22;                  // axis font size
-var AXIS_FONT_FAMILY = 'Roboto';        // axis fonts
-var AXIS_X_TITLE="Generation";          // X-axis label
-var AXIS_Y_TITLE="P(A)";                // Y-axis label 
-var SEED = NaN;                         // default seed for pseudo-random number generation
-var FRAME_TIME = 10;
-var FRAME_LIMIT = 100;
+let NO_DRIFT_COLOR='#007bff';           // color for "No gene drift" ideal trace 
+let TRACE_COLOR='#212529';              // color for simulated population traces
+let AXIS_FONT_COLOR=TRACE_COLOR;        // axis font color
+let AXIS_FONT_SIZE=22;                  // axis font size
+let AXIS_FONT_FAMILY = 'Roboto';        // axis fonts
+let AXIS_X_TITLE="Generation";          // X-axis label
+let AXIS_Y_TITLE="P(A)";                // Y-axis label 
+let SEED = NaN;                         // default seed for pseudo-random number generation
+let FRAME_TIME = 10;
+let FRAME_LIMIT = 100;
 
 // execute when the DOM is fully loaded
 $(function() {
 
     // configure website footer
-    var d = new Date();
+    let d = new Date();
     $("#footer_wrapper").append(
         '<div class="footer"><center>Copyright &copy; ' + d.getFullYear()
         + ' | <a href="terms.html">Terms of Use</a>'
@@ -46,7 +46,7 @@ $(function() {
     );
 
     // initialize config parameters
-    var config = config_from_url();
+    let config = config_from_url();
 
     // update URL and control panel with latest paramters
     update_url(config);
@@ -86,7 +86,7 @@ $(function() {
     $('.load_hide').show();    
 
     // draw initial plot
-    var run = new Run();
+    let run = new Run();
 
     // update plot dimensions when window is resized
     $(window).resize(function() {
@@ -163,16 +163,16 @@ Run.prototype.calc_popg = function() {
         store generation
     */
 
-    var config = this.config;
-    var beginGen = this.gensSoFar;
-    var endGen = beginGen + config.numGen;
+    let config = this.config;
+    let beginGen = this.gensSoFar;
+    let endGen = beginGen + config.numGen;
     this.gensSoFar = this.gensSoFar + config.numGen; // Technically not true until the end of all gens in this run, shoudl move this down
 
-    var currentPopSize = config.popSize * 2; // TODO look into pop gen (diploids, # ppl vs # chromosomes)
+    let currentPopSize = config.popSize * 2; // TODO look into pop gen (diploids, # ppl vs # chromosomes)
     
     if (this.newRun == true){
         // Initialize the big generation array with the starting values for each population
-        var i;
+        let i;
         for (i = 0; i <= config.numPop; i++){
             this.popArray.push(config.initFreqA);
         }
@@ -182,25 +182,25 @@ Run.prototype.calc_popg = function() {
     this.newRun = false;
    
     // Loop through all generations
-    var pbar;
-    var p;
-    var q;
-    var w;
-    var pp1;
-    var pp2;
-    var nx;
-    var ny;
-    var numFixedPops;
-    var numLostPops;
-    var generation;
+    let pbar;
+    let p;
+    let q;
+    let w;
+    let pp1;
+    let pp2;
+    let nx;
+    let ny;
+    let numFixedPops;
+    let numLostPops;
+    let generation;
     for (generation = beginGen; generation < endGen; generation++){
         pbar = 0;
-        var nextPopArray = [];
+        let nextPopArray = [];
         this.popArray = this.genArray[generation];
         
         // Count number of populations no longer active
-        for (var j = 1; j <= config.numPop; j++){ // Starting at 1 because our idealized population wont do this?
-            var end = this.popArray[j];
+        for (let j = 1; j <= config.numPop; j++){ // Starting at 1 because our idealized population wont do this?
+            let end = this.popArray[j];
             pbar += end;
             if (end <= 0.0) {
                 numLostPops += 1;
@@ -212,7 +212,7 @@ Run.prototype.calc_popg = function() {
         pbar /= config.numPop;
         
         // Loop through all populations
-        var population;
+        let population;
         for(population = 0; population <= config.numPop; population++){
             p = this.popArray[population];
             // All but population 0 get migrants
@@ -269,17 +269,17 @@ Run.prototype.calc_popg = function() {
 Run.prototype.plot_result = function() {
 
     // determine whether this is a new run
-    var start_idx = 0;
-    var first_run = this.result[0].length - 1 == this.config.numGen;
+    let start_idx = 0;
+    let first_run = this.result[0].length - 1 == this.config.numGen;
     if (first_run == false) {
         start_idx = this.result[0].length - this.config.numGen;
     }
 
     // construct animation frames, each frame is a complete set of traces
-    var frames = [];
-    var frame_threshold = Math.floor(this.result[0].length / FRAME_LIMIT);
-    var frame_counter = 0;
-    for (var frame_idx = start_idx; frame_idx < this.result[0].length; frame_idx++) {
+    let frames = [];
+    let frame_threshold = Math.floor(this.result[0].length / FRAME_LIMIT);
+    let frame_counter = 0;
+    for (let frame_idx = start_idx; frame_idx < this.result[0].length; frame_idx++) {
         if (frame_counter < frame_threshold) {
             frame_counter += 1;
             continue;
@@ -287,12 +287,12 @@ Run.prototype.plot_result = function() {
         frame_counter = 0;
 
         // construct all traces for this frame
-        var traces = [];
-        var x = xrange(0, frame_idx);
-        for (var trace_idx = 0; trace_idx < this.result.length; trace_idx++) {
+        let traces = [];
+        let x = xrange(0, frame_idx);
+        for (let trace_idx = 0; trace_idx < this.result.length; trace_idx++) {
 
             // create a new trace
-            var trace = {
+            let trace = {
                 mode: 'lines',
                 name: "",
                 x: x,
@@ -325,15 +325,15 @@ Run.prototype.plot_result = function() {
     }
 
     // construct layouts with per-frame annotations
-    var layouts = [];
-    for (var i = 0; i < frames.length; i++) {
+    let layouts = [];
+    for (let i = 0; i < frames.length; i++) {
 
         // count number of populations that have fixed or lost the allele
-        var num_fixed = 0;
-        var num_lost = 0;
-        for (var j = 0; j < frames[i].length - 1; j++) {
-            var y_series = frames[i][j].y;
-            var last_value = y_series.slice(-1)[0];
+        let num_fixed = 0;
+        let num_lost = 0;
+        for (let j = 0; j < frames[i].length - 1; j++) {
+            let y_series = frames[i][j].y;
+            let last_value = y_series.slice(-1)[0];
             if (last_value == 1) {
                 num_fixed += 1;
             } else if (last_value == 0) {
@@ -342,7 +342,7 @@ Run.prototype.plot_result = function() {
         }
 
         // configure plot
-        var layout = {
+        let layout = {
             yaxis: {
                 range: [-0.05555555555555555, 1.0555555555555556],
                 title: AXIS_Y_TITLE,
@@ -405,7 +405,7 @@ Run.prototype.plot_result = function() {
         layouts.push(layout);
     }
     
-    var config = {
+    let config = {
         responsive: true,
         displaylogo: false,
         modeBarButtonsToRemove: [
@@ -433,7 +433,7 @@ Run.prototype.plot_result = function() {
     }
 
     // add animated frames to plot
-    for (var i = 0; i < frames.length; i++) {
+    for (let i = 0; i < frames.length; i++) {
         Plotly.animate('plot_div', {
                 data: frames[i],
                 layout: layouts[i]
@@ -460,7 +460,7 @@ Run.prototype.plot_result = function() {
 function get_default_config() {
     
     // set default values
-    var config = {
+    let config = {
         popSize: 100,
         fitAA: 1.0,
         fitAa: 1.0,
@@ -497,8 +497,8 @@ function enable_buttons() {
  * Update URL parameters using the current config object.
  */
 function update_url(config) {
-    var param_names = Object.keys(config);
-    for (var i = 0; i < param_names.length; i++) {
+    let param_names = Object.keys(config);
+    for (let i = 0; i < param_names.length; i++) {
         setUrlParam(param_names[i], config[param_names[i]]);
     }
 }
@@ -508,8 +508,8 @@ function update_url(config) {
  * Update control panel values using the current config object.
  */
 function update_ctrl_panel(config) {
-    var param_names = Object.keys(config);
-    for (var i = 0; i < param_names.length; i++) {
+    let param_names = Object.keys(config);
+    for (let i = 0; i < param_names.length; i++) {
         $('#' + param_names[i]).val(config[param_names[i]]);
     }
 }
@@ -521,7 +521,7 @@ function update_ctrl_panel(config) {
 function restore_defaults() {
 
     // load default params, update URL and control panel
-    var config = get_default_config();
+    let config = get_default_config();
     update_url(config);
     update_ctrl_panel(config);
 
@@ -534,10 +534,10 @@ function restore_defaults() {
 function config_from_url() {
     
     // load default parameters and override with URL params as needed
-    var config = get_default_config();
-    var param_names = Object.keys(config);
-    for (var i = 0; i < param_names.length; i++) {
-        var url_value = getUrlParam(param_names[i]);
+    let config = get_default_config();
+    let param_names = Object.keys(config);
+    for (let i = 0; i < param_names.length; i++) {
+        let url_value = getUrlParam(param_names[i]);
         if (url_value) {
             config[param_names[i]] = parseFloat(url_value);
         }
@@ -555,7 +555,7 @@ function config_from_url() {
 function random() {
 
     // generate a seeded pseudo-random number
-    var rand;
+    let rand;
     if (isNaN(SEED)) {
         rand = Math.random();
     } else {
@@ -575,8 +575,8 @@ function random() {
  * with the probability of success in any given trial as p
  */
 function binomial(n, p) {
-    var successes = 0;
-    var trial;
+    let successes = 0;
+    let trial;
     for (trial = 0; trial < n; trial++){
         if (random() < p){
             successes++;
@@ -591,7 +591,7 @@ function binomial(n, p) {
  */
 function setUrlParam(key, value) {
 
-    var baseUrl = [location.protocol, '//', location.host, location.pathname].join(''),
+    let baseUrl = [location.protocol, '//', location.host, location.pathname].join(''),
         urlQueryString = document.location.search,
         newParam = key + '=' + value,
         params = '?' + newParam;
@@ -616,17 +616,17 @@ function setUrlParam(key, value) {
 /**
  * get url query param from https://html-online.com/articles/get-url-parameters-javascript/
  */
-function getUrlVars() {
-    var vars = {};
-    var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
-        vars[key] = value;
+function getUrllets() {
+    let lets = {};
+    let parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+        lets[key] = value;
     });
-    return vars;
+    return lets;
 }
 function getUrlParam(parameter, defaultvalue){
-    var urlparameter = defaultvalue;
+    let urlparameter = defaultvalue;
     if(window.location.href.indexOf(parameter) > -1){
-        urlparameter = getUrlVars()[parameter];
+        urlparameter = getUrllets()[parameter];
         }
     return urlparameter;
 }
@@ -638,8 +638,8 @@ function getUrlParam(parameter, defaultvalue){
 function xrange(min, max) {
 
     // generate array    
-    var x = [];
-    for (var i = min; i <= max; i++) {
+    let x = [];
+    for (let i = min; i <= max; i++) {
         x.push(i);
     }
 
