@@ -147,7 +147,20 @@ Run.prototype.init = function() {
             this.totalLostTransposed[j][i] = list[ j ];
         }
     }
-    document.querySelector('#plot_div').innerHTML = `<pre>${popSizes.join('\t')}\n\n${(this.totalLostTransposed.map(li => li.join('\t')).join('\n'))}</pre>`
+    const div = document.querySelector('#plot_div');
+    const table = this.totalLostTransposed.map(li => li.join('\t')).join('\n');
+    div.innerHTML = `<pre>${popSizes.join('\t')}\n\n${table}</pre>`;
+    const button = document.createElement('button');
+    button.innerText = 'Click to copy (paste in excel/sheets)'
+    button.onclick = () => {
+        navigator.clipboard.writeText(table).then(r => {
+            button.innerText = 'Copied!'
+            setTimeout(() => {
+                button.innerText = 'Click to copy (paste in excel/sheets)';
+            }, 500);
+        });
+    }
+    div.appendChild(button)
 };
 Run.prototype.continue = function() {
 
