@@ -118,22 +118,35 @@ Run.prototype.init = function() {
 
     // temporarily disable plot buttons
     disable_buttons();
+    this.totalLost = []
+    this.totalLostTransposed = []
 
-    // initialize config object with latest parameters
-    this.config = config_from_url();
-    SEED = this.config.randSeed;
+    for (let popSize of [50,100,250,500,750,1000,1500,2000,2500,3000]) {
+        // initialize config object with latest parameters
+        this.config = config_from_url();
+        this.config.popSize = popSize;
+        this.config.numGen = Number.MAX_SAFE_INTEGER
+        SEED = this.config.randSeed;
 
-    this.genArray = [];
-    this.popArray = [];
-    this.gensSoFar = 0;
-    this.newRun = true;
+        this.genArray = [];
+        this.popArray = [];
+        this.gensSoFar = 0;
+        this.newRun = true;
 
-    // run simulation
-    this.result = this.calc_popg();
-    
-    // create plot
-    this.plot_result()
-
+        // run simulation
+        this.result = this.calc_popg();
+        // create plot
+        // this.plot_result()
+    }
+    console.log(this.totalLost)
+    for (let i = 0; i < this.totalLost.length; i++) {
+        const list = this.totalLost[i];
+        for (let j = 0; j < list.length; j++) {
+            if (!this.totalLostTransposed[j]) this.totalLostTransposed[j] = []
+            this.totalLostTransposed[j][i] = list[ j ];
+        }
+    }
+    console.log(this.totalLostTransposed.map(li => li.join('\t')).join('\n'))
 };
 Run.prototype.continue = function() {
 
@@ -190,9 +203,11 @@ Run.prototype.calc_popg = function() {
     let pp2;
     let nx;
     let ny;
-    let numFixedPops;
-    let numLostPops;
+    let numFixedPops = 0;
+    let numLostPops = 0;
     let generation;
+    let lostGenerations = [];
+    let lostIndices = [];
     for (generation = beginGen; generation < endGen; generation++){
         pbar = 0;
         let nextPopArray = [];
@@ -202,13 +217,19 @@ Run.prototype.calc_popg = function() {
         for (let j = 1; j <= config.numPop; j++){ // Starting at 1 because our idealized population wont do this?
             let end = this.popArray[j];
             pbar += end;
+            if (lostIndices.includes(j)) continue;
             if (end <= 0.0) {
                 numLostPops += 1;
+                lostGenerations[j - 1] = generation - 1;
+                lostIndices.push(j);
             }            
             if (end >= 1.0) {
                 numFixedPops += 1;
+                lostGenerations[j - 1] = generation - 1;
+                lostIndices.push(j);
             }
         }
+        if (numLostPops + numFixedPops >= this.config.numPop) break;
         pbar /= config.numPop;
         
         // Loop through all populations
@@ -258,7 +279,8 @@ Run.prototype.calc_popg = function() {
         this.genArray.push(nextPopArray);
         
     } // end generation
-    
+    console.log(`done with ${this.config.popSize}`)
+    this.totalLost.push(lostGenerations);
     // transpose data for plotting
     this.plot_genArray = this.genArray[0].map((col, i) => this.genArray.map(row => row[i]));
 
@@ -267,7 +289,7 @@ Run.prototype.calc_popg = function() {
 
 };
 Run.prototype.plot_result = function() {
-
+    if (true) return
     // determine whether this is a new run
     let start_idx = 0;
     let first_run = this.result[0].length - 1 == this.config.numGen;
