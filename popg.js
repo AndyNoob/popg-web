@@ -121,7 +121,8 @@ Run.prototype.init = function() {
     this.totalLost = []
     this.totalLostTransposed = []
 
-    for (let popSize of [50,100,250,500,750,1000,1500,2000,2500,3000]) {
+    const popSizes = [50,100,250,500,750,1000,1500,2000,2500,3000];
+    for (let popSize of popSizes) {
         // initialize config object with latest parameters
         this.config = config_from_url();
         this.config.popSize = popSize;
@@ -146,7 +147,7 @@ Run.prototype.init = function() {
             this.totalLostTransposed[j][i] = list[ j ];
         }
     }
-    console.log(this.totalLostTransposed.map(li => li.join('\t')).join('\n'))
+    document.querySelector('#plot_div').innerHTML = `<pre>${popSizes.join('\t')}\n\n${(this.totalLostTransposed.map(li => li.join('\t')).join('\n'))}</pre>`
 };
 Run.prototype.continue = function() {
 
